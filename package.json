@@ -3,8 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
@@ -22,7 +23,11 @@
   },
   "homepage": "https://github.com/sheppy/ki-cms#readme",
   "dependencies": {
+    "front-matter": "^2.0.8",
+    "is-directory": "^0.3.1",
+    "koa": "^1.2.0",
+    "markdown-it": "^6.0.2",
+    "promisify-node": "^0.4.0"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
