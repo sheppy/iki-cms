@@ -1,0 +1,28 @@
+{
+  "name": "iki-cms",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "6.2.0",
+    "npm": "3.8.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sheppy/ki-cms.git"
+  },
+  "author": "Chris Sheppard (http://www.chrissheppard.co.uk/)",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/sheppy/ki-cms/issues"
+  },
+  "homepage": "https://github.com/sheppy/ki-cms#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
