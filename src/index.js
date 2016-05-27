@@ -57,28 +57,32 @@ nunjucks.configure(TEMPLATE_PATH, { noCache: !IS_PRODUCTION });
 const nunjRender = promisify(nunjucks.render);
 
 
-const render = function(view = "default", data) {
-    // Inject the global data
-    return fs.readFile(path.join(CONTENT_PATH, "global") + ".md", "utf8")
+const loadFrontMatteredMarkdownContent = function(filename) {
+    return fs.readFile(path.join(CONTENT_PATH, filename) + ".md", "utf8")
         .then(fm)
-        .then(global => data.global = global.attributes)
-        .then(() => nunjRender(path.join("page", view) + ".njk", data));
+        .then(content => {
+            content.body = content.body ? app.context.md.render(content.body) : "";
+            return content;
+        });
+};
+
+
+const render = function *(view = "default", data) {
+    // Inject the global data
+    let global = yield loadFrontMatteredMarkdownContent("global");
+    data.global = global.attributes;
+    return nunjRender(path.join("page", view) + ".njk", data);
 };
 
 
 const getContentFilenameFromUrl = function(url) {
-    let filename = path.join(CONTENT_PATH, "page", path.normalize(url));
+    let filename = path.join("page", path.normalize(url));
 
-    if (isDirectory.sync(filename)) {
+    if (isDirectory.sync(path.join(CONTENT_PATH, filename))) {
         filename = path.join(filename, "index");
     }
 
-    return filename + ".md";
-};
-
-
-const getContentFromUrl = function(url) {
-    return fs.readFile(getContentFilenameFromUrl(url), "utf8").then(fm);
+    return filename;
 };
 
 
@@ -86,15 +90,12 @@ const page = function *(next) {
     let content;
 
     try {
-        content = yield getContentFromUrl(this.request.url);
+        content = yield loadFrontMatteredMarkdownContent(getContentFilenameFromUrl(this.request.url));
     } catch (err) {
         return yield next;
     }
 
-    this.body = yield render(content.attributes.template, {
-        body: content.body ? this.md.render(content.body) : "",
-        attributes: content.attributes
-    });
+    this.body = yield render(content.attributes.template, content);
 };
 
 
