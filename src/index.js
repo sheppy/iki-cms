@@ -56,7 +56,7 @@ nunjucks.configure(TEMPLATE_PATH, { noCache: !IS_PRODUCTION });
 
 
 const render = function(view = "default", data) {
-    return nunjucks.render(path.join("page", view) + ".nunj", data);
+    return nunjucks.render(path.join("page", view) + ".njk", data);
 };
 
 
