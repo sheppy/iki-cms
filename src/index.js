@@ -19,6 +19,9 @@ const SWIG_OPTIONS = {
     cache: false    // TODO: Only in development
 };
 
+const PORT = process.env.PORT || 8080;
+
+
 const app = koa();
 
 // Logging
@@ -52,14 +55,10 @@ app.context.md = new MarkdownIt({
 
 
 
-
-
-
-
-
-
-
-
+const render = function(view = "default", data) {
+    let template = swig.compileFile(path.join(TEMPLATE_PATH, view) + '.swig', SWIG_OPTIONS);
+    return template(data);
+};
 
 
 const getContentFilenameFromUrl = function(url) {
@@ -72,57 +71,40 @@ const getContentFilenameFromUrl = function(url) {
     return filename + ".md";
 };
 
+
 const getContentFromUrl = function(url) {
     return fs.readFile(getContentFilenameFromUrl(url), "utf8").then(fm);
 };
 
+
 const page = function *(next) {
-    let content, templateName;
+    let content;
 
     try {
         content = yield getContentFromUrl(this.request.url);
-        templateName = content.attributes.template || 'default';
     } catch (err) {
         return yield next;
     }
 
-    let template = swig.compileFile(path.join(TEMPLATE_PATH, templateName) + '.swig', SWIG_OPTIONS);
-
-    this.body = template({
+    this.body = render(content.attributes.template, {
         body: content.body ? this.md.render(content.body) : '',
         attributes: content.attributes
     });
 };
 
 
-
-
-
-// app.use(function *(next) {
-//     this.log.info('Got a request from %s for %s', this.request.ip, this.path);
-//     yield next;
-// });
-
-app.use(page);
-
-// Error handler
-app.use(function *serverError(next) {
+const serverError = function *(next) {
     try {
         yield next;
     } catch (err) {
-        // TODO: Display server error page
         this.status = err.status || 500;
-
-        let template = swig.compileFile(path.join(TEMPLATE_PATH, ""+this.status) + '.swig', SWIG_OPTIONS);
-
-        this.body = template({
-            message: err.message
-        });
-        this.app.emit('error', err, this);
+        this.body = render("500", { err });
+        this.app.emit("error", err, this);
     }
-});
+};
 
-app.use(function *pageNotFound(next) {
+
+const pageNotFound = function *(next) {
     yield next;
 
     if (this.status !== 404) {
@@ -131,20 +113,19 @@ app.use(function *pageNotFound(next) {
 
     // Need to explicitly set 404 so that koa doesn't assign 200 on body
     this.status = 404;
-
-    let template = swig.compileFile(path.join(TEMPLATE_PATH, ""+this.status) + '.swig', SWIG_OPTIONS);
-
-    this.body = template();
-});
+    this.body = render("404", { url: this.request.url });
+};
 
 
-// TODO: Logging
-// https://github.com/koajs/logger
-// https://github.com/koajs/bunyan-logger
-// https://github.com/Carlangueitor/winston-koa-logger
+app.use(page);
+app.use(serverError);
+app.use(pageNotFound);
+
+
+// Logging
 app.on('error', function(err) {
-    // log.error('server error', err);
-    console.error('server error', err);
+    console.error(err);
 });
 
-app.listen(8080);
+// Start app
+app.listen(PORT);

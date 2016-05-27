@@ -3,5 +3,10 @@
 
 {% block content %}
     <h1>Server Error</h1>
-    <p>TODO: Message</p>
+
+    <p>The website has encountered an unexpected error or misconfiguration and was unable to complete your request.</p>
+    <p>Please try again in a few minutes.</p>
+
+    {# TODO: Only in development #}
+    <pre><code>{{ err.stack }}</code></pre>
 {% endblock %}

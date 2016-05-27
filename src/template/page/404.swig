@@ -3,5 +3,8 @@
 
 {% block content %}
     <h1>Page Not Found</h1>
-    <p>TODO: Message</p>
+
+    <p>The page you were looking for "{{ url }}" could not be found.</p>
+
+    <p>You may want to try using the <a href="/sitemap">sitemap</a> to find what you were looking for.</p>
 {% endblock %}
