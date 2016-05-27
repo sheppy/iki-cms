@@ -14,7 +14,7 @@ const koaCompress = require("koa-compress");
 const PrettyError = require("pretty-error");
 
 
-const CONTENT_PATH = path.normalize(`${__dirname}/../content/page`);
+const CONTENT_PATH = path.normalize(`${__dirname}/../content`);
 const TEMPLATE_PATH = path.normalize(`${__dirname}/template`);
 const PORT = process.env.PORT || 8080;
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
@@ -54,14 +54,20 @@ app.context.md = new MarkdownIt({
 // Setup nunjucks
 nunjucks.configure(TEMPLATE_PATH, { noCache: !IS_PRODUCTION });
 
+const nunjRender = promisify(nunjucks.render);
+
 
 const render = function(view = "default", data) {
-    return nunjucks.render(path.join("page", view) + ".njk", data);
+    // Inject the global data
+    return fs.readFile(path.join(CONTENT_PATH, "global") + ".md", "utf8")
+        .then(fm)
+        .then(global => data.global = global.attributes)
+        .then(() => nunjRender(path.join("page", view) + ".njk", data));
 };
 
 
 const getContentFilenameFromUrl = function(url) {
-    let filename = path.join(CONTENT_PATH, path.normalize(url));
+    let filename = path.join(CONTENT_PATH, "page", path.normalize(url));
 
     if (isDirectory.sync(filename)) {
         filename = path.join(filename, "index");
@@ -85,7 +91,7 @@ const page = function *(next) {
         return yield next;
     }
 
-    this.body = render(content.attributes.template, {
+    this.body = yield render(content.attributes.template, {
         body: content.body ? this.md.render(content.body) : "",
         attributes: content.attributes
     });
@@ -97,7 +103,7 @@ const serverError = function *(next) {
         yield next;
     } catch (err) {
         this.status = err.status || 500;
-        this.body = render("500", !IS_PRODUCTION ? { err } : {});
+        this.body = yield render("500", !IS_PRODUCTION ? { err } : {});
         this.app.emit("error", err, this);
     }
 };
@@ -112,7 +118,7 @@ const pageNotFound = function *(next) {
 
     // Need to explicitly set 404 so that koa doesn't assign 200 on body
     this.status = 404;
-    this.body = render("404", { url: this.request.url });
+    this.body = yield render("404", { url: this.request.url });
 };
 
 

@@ -5,6 +5,8 @@
     <title>{{ attributes.title | default("Iki CMS") }}</title>
 </head>
 <body>
+    {% include "include/menu.njk" %}
+
     {% block content %}{% endblock %}
 </body>
 </html>
