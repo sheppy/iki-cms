@@ -7,19 +7,16 @@ const isDirectory = require("is-directory");
 const path = require("path");
 const fm = require("front-matter");
 const MarkdownIt = require("markdown-it");
-const swig = require("swig");
+const nunjucks = require("nunjucks");
 const koaLogger = require("koa-logger");
 const koaRateLimit = require("koa-better-ratelimit");
 const koaCompress = require("koa-compress");
 
 
 const CONTENT_PATH = path.normalize(`${__dirname}/../content/page`);
-const TEMPLATE_PATH = path.normalize(`${__dirname}/template/page`);
-const SWIG_OPTIONS = {
-    cache: false    // TODO: Only in development
-};
-
+const TEMPLATE_PATH = path.normalize(`${__dirname}/template`);
 const PORT = process.env.PORT || 8080;
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 
 const app = koa();
@@ -36,11 +33,8 @@ app.use(koaRateLimit({
 
 // Add gzip compression
 app.use(koaCompress({
-    filter: function(content_type) {
-        // filter requests to be compressed using regex
-        return /text/i.test(content_type)
-    },
-    threshold: 860, //minimum size to compress
+    filter: content_type => /text/i.test(content_type),
+    threshold: 860, // Minimum size to compress
     flush: require('zlib').Z_SYNC_FLUSH
 }));
 
@@ -50,14 +44,12 @@ app.context.md = new MarkdownIt({
     typographer: true
 });
 
-
-
-
+// Setup nunjucks
+nunjucks.configure(TEMPLATE_PATH, { noCache: !IS_PRODUCTION });
 
 
 const render = function(view = "default", data) {
-    let template = swig.compileFile(path.join(TEMPLATE_PATH, view) + '.swig', SWIG_OPTIONS);
-    return template(data);
+    return nunjucks.render(path.join("page", view) + ".nunj", data);
 };
 
 
@@ -87,7 +79,7 @@ const page = function *(next) {
     }
 
     this.body = render(content.attributes.template, {
-        body: content.body ? this.md.render(content.body) : '',
+        body: content.body ? this.md.render(content.body) : "",
         attributes: content.attributes
     });
 };

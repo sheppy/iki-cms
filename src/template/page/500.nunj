@@ -1,4 +1,4 @@
-{% extends "../layout/default.swig" %}
+{% extends "layout/default.nunj" %}
 
 
 {% block content %}

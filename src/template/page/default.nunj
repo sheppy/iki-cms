@@ -1,0 +1,6 @@
+{% extends "layout/default.nunj" %}
+
+
+{% block content %}
+    {{ body | safe }}
+{% endblock %}

@@ -1,5 +1,5 @@
 ---
-title: Iki CMS
+title: Home
 template: default
 description: A flat file CMS
 ---
