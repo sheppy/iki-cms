@@ -11,6 +11,7 @@ const nunjucks = require("nunjucks");
 const koaLogger = require("koa-logger");
 const koaRateLimit = require("koa-better-ratelimit");
 const koaCompress = require("koa-compress");
+const PrettyError = require("pretty-error");
 
 
 const CONTENT_PATH = path.normalize(`${__dirname}/../content/page`);
@@ -18,7 +19,13 @@ const TEMPLATE_PATH = path.normalize(`${__dirname}/template`);
 const PORT = process.env.PORT || 8080;
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
+// Friendlier error messages
+const pe = new PrettyError();
+pe.skipNodeFiles();
+pe.skipPackage("nunjucks");
 
+
+// Create the app
 const app = koa();
 
 // Logging
@@ -90,7 +97,7 @@ const serverError = function *(next) {
         yield next;
     } catch (err) {
         this.status = err.status || 500;
-        this.body = render("500", { err });
+        this.body = render("500", !IS_PRODUCTION ? { err } : {});
         this.app.emit("error", err, this);
     }
 };
@@ -109,14 +116,14 @@ const pageNotFound = function *(next) {
 };
 
 
-app.use(page);
 app.use(serverError);
 app.use(pageNotFound);
+app.use(page);
 
 
 // Logging
-app.on('error', function(err) {
-    console.error(err);
+app.on("error", function(err) {
+    console.error(pe.render(err));
 });
 
 // Start app
