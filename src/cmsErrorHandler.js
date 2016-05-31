@@ -8,8 +8,8 @@ pe.skipNodeFiles();
 pe.skipPackage("nunjucks");
 
 
-const CmsErrorHandler = function() {
-    this.app.on("error", function(err) {
+const CmsErrorHandler = function(app) {
+    app.on("error", function(err) {
         console.error(pe.render(err));
     });
 };
