@@ -3,19 +3,20 @@
 const path = require("path");
 const url = require("url");
 const express = require("express");
-const config = require("yaml-config");
 const compression = require("compression");
 const morgan = require("morgan");
 const glob = require("glob");
 const nunjucks = require("nunjucks");
 const winston = require("winston");
+
+const Config = require("./Config");
 const utilities = require("./utilities");
 const logger = require("./logger");
 
 
 class Cms {
     initialize(configPath) {
-        this.settings = config.readConfig(configPath);
+        Config.load(configPath);
 
         this.app = express();
 
@@ -26,7 +27,7 @@ class Cms {
         this.router = express.Router();
         this.app.use(this.router);
 
-        nunjucks.configure(this.settings.viewPath, { noCache: !utilities.isProduction() });
+        nunjucks.configure(Config.get("viewPath"), { noCache: !utilities.isProduction() });
     }
 
     configureRoutes(cb) {
@@ -45,9 +46,9 @@ class Cms {
     routePage() {
         return (req, res, next) => {
             const pathname = url.parse(req.originalUrl).pathname;
-            utilities.getMarkdownForUrl(this.settings.contentPath, pathname)
+            utilities.getMarkdownForUrl(Config.get("contentPath"), pathname)
                 .then(markdown => this._checkPageType(req, pathname, markdown))
-                .then(markdown => utilities.renderMarkdown(this.settings.defaultTemplate, markdown))
+                .then(markdown => utilities.renderMarkdown(Config.get("defaultTemplate"), markdown))
                 .then(html => res.send(html))
                 .catch(next);
         };
@@ -70,7 +71,7 @@ class Cms {
     getListingMarkdown(req, markdown) {
         let pagination = this._createPaginationObject(req.query.page, markdown.perPage);
 
-        return utilities.getContentFilenamesFromUrl(this.settings.contentPath, markdown.listing, ".md")
+        return utilities.getContentFilenamesFromUrl(Config.get("contentPath"), markdown.listing, ".md")
             .then(this._ignoreIndex)
             .then(files => this._paginate(files, pagination))
             .then(this._getListingMarkdown)
@@ -85,7 +86,7 @@ class Cms {
         let pagination = this._createPaginationObject(req.query.page, markdown.perPage);
 
         // TODO: Want to get these from the public path?
-        return utilities.getContentFilenamesFromUrl(this.settings.contentPath, markdown.listing, ".jpg")
+        return utilities.getContentFilenamesFromUrl(Config.get("contentPath"), markdown.listing, ".jpg")
             .then(this._ignoreIndex)
             .then(files => this._paginate(files, pagination))
             // TODO: Get names better?
@@ -106,7 +107,7 @@ class Cms {
             page: parseInt(page || 1, 10),
             total: 0,
             pages: 0,
-            perPage: parseInt(perPage || this.settings.defaultPerPage, 10),
+            perPage: parseInt(perPage || Config.get("defaultPerPage"), 10),
             offset: 0
         };
 
@@ -135,8 +136,8 @@ class Cms {
 
     route404() {
         return (req, res, next) => {
-            utilities.getMarkdownForUrl(this.settings.contentPath, "404")
-                .then(markdown => utilities.renderMarkdown(this.settings.defaultTemplate, markdown, "error/404"))
+            utilities.getMarkdownForUrl(Config.get("contentPath"), "404")
+                .then(markdown => utilities.renderMarkdown(Config.get("defaultTemplate"), markdown, "error/404"))
                 .then(html => res.status(404).send(html))
                 .catch(next);
         };
@@ -146,8 +147,8 @@ class Cms {
         return (err, req, res, next) => {
             this.logger.error(err.stack);
 
-            utilities.getMarkdownForUrl(this.settings.contentPath, "500")
-                .then(markdown => utilities.renderMarkdown(this.settings.defaultTemplate, markdown, "error/500"))
+            utilities.getMarkdownForUrl(Config.get("contentPath"), "500")
+                .then(markdown => utilities.renderMarkdown(Config.get("defaultTemplate"), markdown, "error/500"))
                 .then(html => res.status(500).send(html))
                 .catch(next);
         };
@@ -161,7 +162,7 @@ class Cms {
     }
 
     start() {
-        this.app.listen(process.env.PORT || this.settings.defaultPort)
+        this.app.listen(process.env.PORT || Config.get("defaultPort"));
     }
 }
 
