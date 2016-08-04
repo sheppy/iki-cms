@@ -8,21 +8,12 @@ const yamlFront = require("yaml-front-matter");
 const marked = require("marked");
 
 const Config = require("./../Config");
+const Utilities = require("./../Utilities");
 
 
 class Content {
-    realUrl(originalUrl) {
-        return url.parse(originalUrl).pathname;
-    }
-
-
-    sanitizePath(filePath) {
-        return path.normalize(filePath).replace(/(\.\.)+/g, "");
-    }
-
-
     getFilenameFromUrl(url, root, extension, index) {
-        let filename = path.join(root, this.sanitizePath(url));
+        let filename = path.join(root, Utilities.sanitizePath(url));
 
         if (index && isDirectory.sync(filename)) {
             filename = path.join(filename, index);
@@ -59,7 +50,7 @@ class Content {
 
 
     load(req) {
-        let markdownFilename = this.getFilenameFromUrl(this.realUrl(req.originalUrl), Config.get("contentPath"), ".md", "index");
+        let markdownFilename = this.getFilenameFromUrl(Utilities.realUrl(req.originalUrl), Config.get("contentPath"), ".md", "index");
         return this.loadMarkdownFile(markdownFilename);
     }
 }

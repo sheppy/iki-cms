@@ -5,6 +5,7 @@ const url = require("url");
 const glob = require("glob");
 
 const Config = require("./../Config");
+const Utilities = require("./../Utilities");
 const Content = require("./Content");
 
 
@@ -25,7 +26,7 @@ class Listing {
 
 
     getFilenamesFromUrl(url, root, extension) {
-        let globPattern = path.join(root, Content.sanitizePath(url), `/*${extension}`);
+        let globPattern = path.join(root, Utilities.sanitizePath(url), `/*${extension}`);
 
         return new Promise((resolve, reject) => {
             glob(globPattern, {}, (err, files) => {
@@ -57,7 +58,7 @@ class Listing {
     load(req, content) {
         let pagination = this.createPaginationObject(req.query.page, content.perPage);
 
-        return this.getFilenamesFromUrl(Content.realUrl(req.originalUrl), Config.get("contentPath"), ".md")
+        return this.getFilenamesFromUrl(Utilities.realUrl(req.originalUrl), Config.get("contentPath"), ".md")
             .then(this.ignoreIndex)
             .then(files => this.paginate(files, pagination))
             .then(this.getListingMarkdown)

@@ -9,10 +9,9 @@ const nunjucks = require("nunjucks");
 const winston = require("winston");
 
 const Config = require("./Config");
+const Utilities = require("./Utilities");
 const ContentService = require("./Content/ContentService");
 const logger = require("./logger");
-
-const IS_PRODUCTION = (process.env.NODE_ENV === "production");
 
 
 class Cms {
@@ -28,7 +27,7 @@ class Cms {
         this.router = express.Router();
         this.app.use(this.router);
 
-        nunjucks.configure(Config.get("viewPath"), { noCache: !IS_PRODUCTION });
+        nunjucks.configure(Config.get("viewPath"), { noCache: !Utilities.isProduction() });
     }
 
     configureRoutes(cb) {

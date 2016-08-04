@@ -3,7 +3,7 @@
 const path = require("path");
 
 const Config = require("../Config");
-const Content = require("./Content");
+const Utilities = require("../Utilities");
 const Listing = require("./Listing");
 
 
@@ -15,7 +15,7 @@ class ImageListing extends Listing.class {
     load(req, content) {
         let pagination = this.createPaginationObject(req.query.page, content.perPage);
 
-        return this.getFilenamesFromUrl(Content.realUrl(req.originalUrl), Config.get("contentPath"), ".jpg")
+        return this.getFilenamesFromUrl(Utilities.realUrl(req.originalUrl), Config.get("contentPath"), ".jpg")
             .then(this.ignoreIndex)
             .then(files => this.paginate(files, pagination))
             // TODO: Get names better?
