@@ -1,0 +1,8 @@
+default:
+    title: Iki CMS
+
+    defaultPort: 3001
+    contentPath: "example/content"
+    viewPath: "example/view"
+    defaultTemplate: "template/default"
+    defaultPerPage: 10

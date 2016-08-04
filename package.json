@@ -14,25 +14,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sheppy/ki-cms.git"
+    "url": "git+https://github.com/sheppy/iki-cms.git"
   },
   "author": "Chris Sheppard (http://www.chrissheppard.co.uk/)",
   "license": "GPL-2.0",
   "bugs": {
-    "url": "https://github.com/sheppy/ki-cms/issues"
+    "url": "https://github.com/sheppy/iki-cms/issues"
   },
-  "homepage": "https://github.com/sheppy/ki-cms#readme",
+  "homepage": "https://github.com/sheppy/iki-cms#readme",
   "dependencies": {
-    "front-matter": "^2.0.8",
-    "is-directory": "^0.3.1",
-    "koa": "^1.2.0",
-    "koa-better-ratelimit": "^2.1.2",
-    "koa-compress": "^1.0.9",
-    "koa-logger": "^1.3.0",
-    "markdown-it": "^6.0.2",
-    "nunjucks": "^2.4.2",
-    "pretty-error": "^2.0.0",
-    "promisify-node": "^0.4.0"
+    "compression": "1.6.2",
+    "express": "4.14.0",
+    "glob": "7.0.5",
+    "is-directory": "0.3.1",
+    "marked": "0.3.6",
+    "morgan": "1.7.0",
+    "nunjucks": "2.4.2",
+    "winston": "2.2.0",
+    "yaml-config": "0.3.0",
+    "yaml-front-matter": "3.4.0"
   },
   "devDependencies": {}
 }

@@ -1,0 +1,31 @@
+{% extends "layout/main.njk" %}
+
+
+{% block head %}
+    {{ super() }}
+    <meta name="robots" content="noindex">
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="container">
+        <h1>{{ title }}</h1>
+
+        <p>The page you were looking for "{{ url }}" could not be found.</p>
+
+        {% if errorType == "direct" %}
+            <p>It looks like this was the result of either a mistyped address or an out-of-date bookmark in your web browser.</p>
+        {% elif errorType == "internal" %}
+            <p>Apparently, there is a broken link on the site. An e-mail has just been sent to the person who can fix
+                this and it should be corrected shortly. No further action is required on your part.</p>
+        {% elif errorType == "search" %}
+            <p>It looks like the search engine has returned a link to an old page. These old links should eventually be
+                removed from their indexes but since these are automatically generated there is no one to contact to try
+                to correct the problem.</p>
+        {% else %}
+            <p>Apparently, there is a broken link on the page you just came from.</p>
+        {% endif %}
+    </div>
+
+{% endblock %}

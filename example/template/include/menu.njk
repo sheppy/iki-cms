@@ -1,9 +1,0 @@
-{% if global and global.menu and global.menu.length %}
-    <ul>
-        {% for item in global.menu %}
-            <li>
-                <a href="{{ item.link }}">{{ item.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}

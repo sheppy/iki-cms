@@ -1,13 +1,13 @@
-{% extends "layout/default.njk" %}
-
-
-{% block content %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Error</title>
+    <meta name="robots" content="noindex">
+</head>
+<body>
     <h1>Server Error</h1>
-
     <p>The website has encountered an unexpected error or misconfiguration and was unable to complete your request.</p>
     <p>Please try again in a few minutes.</p>
-
-    {% if err %}
-        <pre><code>{{ err.stack }}</code></pre>
-    {% endif %}
-{% endblock %}
+</body>
+</html>

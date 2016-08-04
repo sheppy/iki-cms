@@ -1,0 +1,24 @@
+{% extends "layout/main.njk" %}
+
+
+{% block head %}
+    {{ super() }}
+    <meta name="robots" content="noindex">
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="container">
+        <h1>{{ title }}</h1>
+
+        <p>The website has encountered an unexpected error or misconfiguration and was unable to complete your request.</p>
+
+        <p>Please try again in a few minutes.</p>
+
+        {% if error %}
+            <pre><code>{{ error }}</code></pre>
+        {% endif %}
+    </div>
+
+{% endblock %}

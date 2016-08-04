@@ -1,0 +1,29 @@
+{% extends "layout/main.njk" %}
+
+
+{% block content %}
+
+    <div class="container">
+        {{ __html | safe }}
+
+        <ul>
+            {% for listing in __listing %}
+                <li>{{ listing.__html | safe }}</li>
+            {% endfor %}
+        </ul>
+
+        <div>
+            {% if __pagination.page > 1 %}
+                <a href="?page=1">First</a>
+                <a href="?page={{ __pagination.page - 1 }}">Prev</a>
+            {% endif %}
+            <span>{{ __pagination.page }}</span>
+
+            {% if __pagination.page < __pagination.pages %}
+                <a href="?page={{ __pagination.page + 1 }}">Next</a>
+                <a href="?page={{ __pagination.pages }}">Last</a>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
