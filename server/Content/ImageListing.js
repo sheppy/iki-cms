@@ -8,18 +8,18 @@ const Listing = require("./Listing");
 
 
 class ImageListing extends Listing.class {
-    getFileBasenames(files) {
-        return files.map(file => path.basename(file));
+    fixImagePaths(files) {
+        return files.map(file => "/" + path.posix.relative(Config.get("publicPath"), file));
     }
 
     load(req, content) {
         let pagination = this.createPaginationObject(req.query.page, content.perPage);
 
-        return this.getFilenamesFromUrl(Utilities.realUrl(req.originalUrl), Config.get("contentPath"), ".jpg")
+        return this.getFilenamesFromUrl(Utilities.realUrl(req.originalUrl), Config.get("publicPath"), ".jpg")
             .then(this.ignoreIndex)
             .then(files => this.paginate(files, pagination))
-            // TODO: Get names better?
-            .then(this.getFileBasenames)
+            .then(this.checkValidPage)
+            .then(this.fixImagePaths)
             .then(files => {
                 content.__pagination = pagination;
                 content.__listing = files;

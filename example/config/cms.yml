@@ -3,6 +3,7 @@ default:
 
     defaultPort: 3001
     contentPath: "example/content"
+    publicPath: "example/public"
     viewPath: "example/view"
     defaultTemplate: "template/default"
     defaultPerPage: 10

@@ -55,12 +55,22 @@ class Listing {
     }
 
 
+    checkValidPage(files) {
+        if (!files.length) {
+            return new Promise((resolve, reject) => reject());
+        }
+
+        return files;
+    }
+
+
     load(req, content) {
         let pagination = this.createPaginationObject(req.query.page, content.perPage);
 
         return this.getFilenamesFromUrl(Utilities.realUrl(req.originalUrl), Config.get("contentPath"), ".md")
             .then(this.ignoreIndex)
             .then(files => this.paginate(files, pagination))
+            .then(this.checkValidPage)
             .then(this.getListingMarkdown)
             .then(files => {
                 content.__pagination = pagination;

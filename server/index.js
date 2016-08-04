@@ -37,7 +37,9 @@ class Cms {
 
         this.router.use("*", this.routePage());
 
-        // TODO: Static routes
+        // Static routes
+        this.router.use(express.static(Config.get("publicPath")));
+
         this.router.use(this.route404());
         this.router.use(this.route500());
         this.router.use(this.route500Static());
