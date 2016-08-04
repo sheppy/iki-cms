@@ -5,13 +5,14 @@ const url = require("url");
 const express = require("express");
 const compression = require("compression");
 const morgan = require("morgan");
-const glob = require("glob");
 const nunjucks = require("nunjucks");
 const winston = require("winston");
 
 const Config = require("./Config");
-const utilities = require("./utilities");
+const ContentService = require("./Content/ContentService");
 const logger = require("./logger");
+
+const IS_PRODUCTION = (process.env.NODE_ENV === "production");
 
 
 class Cms {
@@ -27,7 +28,7 @@ class Cms {
         this.router = express.Router();
         this.app.use(this.router);
 
-        nunjucks.configure(Config.get("viewPath"), { noCache: !utilities.isProduction() });
+        nunjucks.configure(Config.get("viewPath"), { noCache: !IS_PRODUCTION });
     }
 
     configureRoutes(cb) {
@@ -44,102 +45,14 @@ class Cms {
     }
 
     routePage() {
-        return (req, res, next) => {
-            const pathname = url.parse(req.originalUrl).pathname;
-            utilities.getMarkdownForUrl(Config.get("contentPath"), pathname)
-                .then(markdown => this._checkPageType(req, pathname, markdown))
-                .then(markdown => utilities.renderMarkdown(Config.get("defaultTemplate"), markdown))
-                .then(html => res.send(html))
-                .catch(next);
-        };
-    }
-
-    _checkPageType(req, pathname, markdown) {
-        if (markdown.type == "listing") {
-            markdown.listing = markdown.listing || pathname;
-            return this.getListingMarkdown(req, markdown);
-        }
-
-        if (markdown.type == "images") {
-            markdown.listing = markdown.listing || pathname;
-            return this.getListingImages(req, markdown);
-        }
-
-        return markdown;
-    }
-
-    getListingMarkdown(req, markdown) {
-        let pagination = this._createPaginationObject(req.query.page, markdown.perPage);
-
-        return utilities.getContentFilenamesFromUrl(Config.get("contentPath"), markdown.listing, ".md")
-            .then(this._ignoreIndex)
-            .then(files => this._paginate(files, pagination))
-            .then(this._getListingMarkdown)
-            .then(listing => {
-                markdown.__pagination = pagination;
-                markdown.__listing = listing;
-                return markdown;
-            });
-    }
-
-    getListingImages(req, markdown) {
-        let pagination = this._createPaginationObject(req.query.page, markdown.perPage);
-
-        // TODO: Want to get these from the public path?
-        return utilities.getContentFilenamesFromUrl(Config.get("contentPath"), markdown.listing, ".jpg")
-            .then(this._ignoreIndex)
-            .then(files => this._paginate(files, pagination))
-            // TODO: Get names better?
-            .then(this._getFileBasenames)
-            .then(listing => {
-                markdown.__pagination = pagination;
-                markdown.__listing = listing;
-                return markdown;
-            });
-    }
-
-    _ignoreIndex(files) {
-        return files.filter(file => path.basename(file) !== "index.md");
-    }
-
-    _createPaginationObject(page, perPage) {
-        let pagination = {
-            page: parseInt(page || 1, 10),
-            total: 0,
-            pages: 0,
-            perPage: parseInt(perPage || Config.get("defaultPerPage"), 10),
-            offset: 0
-        };
-
-        pagination.offset = (pagination.page - 1) * pagination.perPage;
-
-        return pagination;
-    }
-
-    _paginate(files, pagination) {
-        pagination.total = files.length;
-        pagination.pages = Math.ceil(files.length / pagination.perPage);
-        return files.slice(pagination.offset, pagination.offset + pagination.perPage);
-    }
-
-    _getFileBasenames(files) {
-        return files.map(file => path.basename(file));
-        return Promise.all(files.map(file => utilities.getContentFile(file)))
-            .then(files => Promise.all(files.map(content => utilities.convertFileContentToMarkdown(content))));
-
-    }
-    _getListingMarkdown(files) {
-        return Promise.all(files.map(file => utilities.getContentFile(file)))
-            .then(files => Promise.all(files.map(content => utilities.convertFileContentToMarkdown(content))));
-
+        return (req, res, next) => ContentService.load(req).then(html => res.send(html)).catch(next);
     }
 
     route404() {
         return (req, res, next) => {
-            utilities.getMarkdownForUrl(Config.get("contentPath"), "404")
-                .then(markdown => utilities.renderMarkdown(Config.get("defaultTemplate"), markdown, "error/404"))
-                .then(html => res.status(404).send(html))
-                .catch(next);
+             ContentService.renderFile(`${Config.get("contentPath")}/404.md`, "error/404")
+                 .then(html => res.status(404).send(html))
+                 .catch(next);
         };
     }
 
@@ -147,8 +60,7 @@ class Cms {
         return (err, req, res, next) => {
             this.logger.error(err.stack);
 
-            utilities.getMarkdownForUrl(Config.get("contentPath"), "500")
-                .then(markdown => utilities.renderMarkdown(Config.get("defaultTemplate"), markdown, "error/500"))
+            ContentService.renderFile(`${Config.get("contentPath")}/500.md`, "error/500")
                 .then(html => res.status(500).send(html))
                 .catch(next);
         };
