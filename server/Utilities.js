@@ -16,12 +16,15 @@ class Utilities {
         };
     }
 
-    static realUrl(originalUrl) {
+    static getUrlPathname(originalUrl) {
         return url.parse(originalUrl).pathname;
     }
 
     static sanitizePath(filePath) {
-        return path.normalize(filePath).replace(/(\.\.)+/g, "");
+        return path.normalize(filePath)
+            .replace(/(\.){2}/g, "")
+            .replace(/(\\){2}/g, "\\")
+            .replace(/(\/){2}/g, "/");
     }
 }
 

@@ -67,7 +67,7 @@ class Listing {
     load(req, content) {
         let pagination = this.createPaginationObject(req.query.page, content.perPage);
 
-        return this.getFilenamesFromUrl(Utilities.realUrl(req.originalUrl), Config.get("contentPath"), ".md")
+        return this.getFilenamesFromUrl(Utilities.getUrlPathname(req.originalUrl), Config.get("contentPath"), ".md")
             .then(this.ignoreIndex)
             .then(files => this.paginate(files, pagination))
             .then(this.checkValidPage)

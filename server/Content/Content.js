@@ -50,7 +50,7 @@ class Content {
 
 
     load(req) {
-        let markdownFilename = this.getFilenameFromUrl(Utilities.realUrl(req.originalUrl), Config.get("contentPath"), ".md", "index");
+        let markdownFilename = this.getFilenameFromUrl(Utilities.getUrlPathname(req.originalUrl), Config.get("contentPath"), ".md", "index");
         return this.loadMarkdownFile(markdownFilename);
     }
 }

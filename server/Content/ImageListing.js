@@ -15,7 +15,7 @@ class ImageListing extends Listing.class {
     load(req, content) {
         let pagination = this.createPaginationObject(req.query.page, content.perPage);
 
-        return this.getFilenamesFromUrl(Utilities.realUrl(req.originalUrl), Config.get("publicPath"), ".jpg")
+        return this.getFilenamesFromUrl(Utilities.getUrlPathname(req.originalUrl), Config.get("publicPath"), ".jpg")
             .then(this.ignoreIndex)
             .then(files => this.paginate(files, pagination))
             .then(this.checkValidPage)
