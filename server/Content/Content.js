@@ -26,7 +26,7 @@ class Content {
     getFileContent(filename) {
         return new Promise((resolve, reject) => {
             fs.readFile(filename, (err, data) => {
-                if (err) return reject();
+                if (err) return reject();   // No error in order to throw 404
                 resolve(data);
             });
         });
