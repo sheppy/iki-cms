@@ -13,6 +13,8 @@ const Utilities = require("./Utilities");
 const ContentService = require("./Content/ContentService");
 const logger = require("./logger");
 
+const HTTP_STATUS_NOT_FOUND = 404;
+const HTTP_STATUS_SERVER_ERROR = 500;
 
 class Cms {
     initialize(configPath) {
@@ -51,8 +53,8 @@ class Cms {
 
     route404() {
         return (req, res, next) => {
-             ContentService.renderFile(`${Config.get("contentPath")}/404.md`, "error/404")
-                 .then(html => res.status(404).send(html))
+            ContentService.renderFile(`${Config.get("contentPath")}/404.md`, "error/404")
+                 .then(html => res.status(HTTP_STATUS_NOT_FOUND).send(html))
                  .catch(next);
         };
     }
@@ -62,7 +64,7 @@ class Cms {
             this.logger.error(err.stack);
 
             ContentService.renderFile(`${Config.get("contentPath")}/500.md`, "error/500")
-                .then(html => res.status(500).send(html))
+                .then(html => res.status(HTTP_STATUS_SERVER_ERROR).send(html))
                 .catch(next);
         };
     }
@@ -70,7 +72,7 @@ class Cms {
     route500Static() {
         return (err, req, res, next) => {
             console.error(err.stack);
-            res.status(500).sendFile(path.join(__dirname, "500.html"));
+            res.status(HTTP_STATUS_SERVER_ERROR).sendFile(path.join(__dirname, "500.html"));
         };
     }
 

@@ -1,6 +1,5 @@
 "use strict";
 
-const url = require("url");
 const nunjucks = require("nunjucks");
 
 const Content = require("./Content");

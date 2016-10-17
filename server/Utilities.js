@@ -3,6 +3,9 @@
 const url = require("url");
 const path = require("path");
 
+const REGEX_PARENT_DIRECTORY = /(\.){2}/g;
+const REGEX_DOUBLE_BACK_SLASH = /(\\){2}/g;
+const REGEX_DOUBLE_FORWARD_SLASH = /(\/){2}/g;
 
 class Utilities {
     static isProduction() {
@@ -22,9 +25,9 @@ class Utilities {
 
     static sanitizePath(filePath) {
         return path.normalize(filePath)
-            .replace(/(\.){2}/g, "")
-            .replace(/(\\){2}/g, "\\")
-            .replace(/(\/){2}/g, "/");
+            .replace(REGEX_PARENT_DIRECTORY, "")
+            .replace(REGEX_DOUBLE_BACK_SLASH, "\\")
+            .replace(REGEX_DOUBLE_FORWARD_SLASH, "/");
     }
 }
 
