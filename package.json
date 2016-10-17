@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "server/index.js",
   "scripts": {
     "start": "node src/index.js",
     "test": "mocha --check-leaks --recursive --require ./test/helper/index.js test"
