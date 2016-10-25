@@ -63,7 +63,13 @@ class Cms {
         return (err, req, res, next) => {
             this.logger.error(err.stack);
 
-            ContentService.renderFile(`${Config.get("contentPath")}/500.md`, "error/500")
+            let data = {};
+
+            if (!Utilities.isProduction()) {
+                data.error = err.message;
+            }
+
+            ContentService.renderFile(`${Config.get("contentPath")}/500.md`, "error/500", data)
                 .then(html => res.status(HTTP_STATUS_SERVER_ERROR).send(html))
                 .catch(next);
         };

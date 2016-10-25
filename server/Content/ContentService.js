@@ -8,8 +8,12 @@ const ImageListing = require("./ImageListing");
 
 
 class ContentService {
-    static renderFile(file, template) {
+    static renderFile(file, template, extra) {
         return Content.loadMarkdownFile(file)
+            .then(content => {
+                if (extra) { Object.assign(content, extra); }
+                return content;
+            })
             .then(content => this.renderContent(content, template))
     }
 
