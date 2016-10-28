@@ -53,8 +53,8 @@ class Cms {
         this.router.use(this.route500Static());
     }
 
-    loadContent(req) {
-        return ContentService.load(req);
+    loadContent(req, extra) {
+        return ContentService.load(req, extra);
     }
 
     routePage() {

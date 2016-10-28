@@ -9,16 +9,14 @@ const ImageListing = require("./ImageListing");
 
 class ContentService {
     static renderFile(file, template, extra) {
-        return Content.loadMarkdownFile(file)
-            .then(content => {
-                if (extra) { Object.assign(content, extra); }
-                return content;
-            })
-            .then(content => this.renderContent(content, template))
+        return Content.loadMarkdownFile(file).then(content => this.renderContent(content, template, extra))
     }
 
-    static renderContent(content, template) {
+    static renderContent(content, template, extra) {
         template = template || content.template;
+        if (extra) {
+            Object.assign(content, extra);
+        }
 
         return new Promise((resolve, reject) => {
             nunjucks.render(`${template}.njk`, content, (err, res) => {
@@ -28,7 +26,7 @@ class ContentService {
         });
     }
 
-    static load(req) {
+    static load(req, extra) {
         return Content.load(req)
             .then(content => {
                 // Check what type of page it is
@@ -41,7 +39,9 @@ class ContentService {
                         return content;
                 }
             })
-            .then(ContentService.renderContent);
+            .then(content => {
+                return ContentService.renderContent(content, null, extra);
+            });
     }
 }
 
