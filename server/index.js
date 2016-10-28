@@ -47,8 +47,12 @@ class Cms {
         this.router.use(this.route500Static());
     }
 
+    loadContent(req) {
+        return ContentService.load(req);
+    }
+
     routePage() {
-        return (req, res, next) => ContentService.load(req).then(html => res.send(html)).catch(next);
+        return (req, res, next) => this.loadContent(req).then(html => res.send(html)).catch(next);
     }
 
     route404() {
