@@ -8,6 +8,7 @@ const morgan = require("morgan");
 const nunjucks = require("nunjucks");
 const winston = require("winston");
 const bodyParser = require("body-parser");
+const expressValidator = require("express-validator");
 
 const Config = require("./Config");
 const Utilities = require("./Utilities");
@@ -26,7 +27,10 @@ class Cms {
         this.logger = logger;
         this.app.use(morgan("combined", logger.expressLogger));
         this.app.use(compression());
+        this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use(expressValidator());
+        this.app.set("trust proxy", true);
 
         this.router = express.Router();
         this.app.use(this.router);
