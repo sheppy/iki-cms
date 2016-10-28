@@ -7,6 +7,7 @@ const compression = require("compression");
 const morgan = require("morgan");
 const nunjucks = require("nunjucks");
 const winston = require("winston");
+const bodyParser = require("body-parser");
 
 const Config = require("./Config");
 const Utilities = require("./Utilities");
@@ -25,6 +26,7 @@ class Cms {
         this.logger = logger;
         this.app.use(morgan("combined", logger.expressLogger));
         this.app.use(compression());
+        this.app.use(bodyParser.urlencoded({ extended: true }));
 
         this.router = express.Router();
         this.app.use(this.router);
