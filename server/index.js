@@ -100,5 +100,5 @@ class Cms {
 
 module.exports = Cms;
 module.exports.Config = Config;
-module.exports.Config = ContentService;
+module.exports.ContentService = ContentService;
 module.exports.logger = logger;
