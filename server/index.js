@@ -27,7 +27,7 @@ class Cms {
         this.logger = logger;
         this.app.use(morgan("combined", logger.expressLogger));
         this.app.use(compression());
-        this.app.use(bodyParser.json())
+        this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(expressValidator());
         this.app.set("trust proxy", true);
@@ -99,3 +99,6 @@ class Cms {
 
 
 module.exports = Cms;
+module.exports.Config = Config;
+module.exports.Config = ContentService;
+module.exports.logger = logger;
