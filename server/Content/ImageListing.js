@@ -1,17 +1,29 @@
 "use strict";
 
 const path = require("path");
-
 const Config = require("../Config");
 const Utilities = require("../Utilities");
 const Listing = require("./Listing");
 
 
 class ImageListing extends Listing.class {
+    /**
+     * Fix the image file paths.
+     *
+     * @param {string[]} files - The image filenames to fix.
+     * @returns {string[]} - The fixed filenames.
+     */
     fixImagePaths(files) {
         return files.map(file => "/" + path.posix.relative(Config.get("publicPath"), file));
     }
 
+    /**
+     * Load image listing from the request.
+     *
+     * @param {Object} req - The express request object.
+     * @param {CmsContent} content - The cms content.
+     * @returns {Promise.<CmsContent>} - The converted content.
+     */
     load(req, content) {
         let pagination = this.createPaginationObject(req.query.page, content.perPage);
 
